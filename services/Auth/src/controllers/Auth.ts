@@ -63,3 +63,9 @@ export const addUserRole = TryCtach(async(req:AuthenticatedRequest, res)=>{
 
     res.json({user,token})
 });
+
+export const myProfile= TryCtach(async (req: AuthenticatedRequest ,res)=>{
+    const user = req.user;
+    res.json(user);
+
+})
