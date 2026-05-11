@@ -1,38 +1,43 @@
-import { useState } from "react";
-import { authService } from "../main";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import axios from "axios";
-import { useGoogleLogin } from '@react-oauth/google';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { authService } from "../main";
+import toast from "react-hot-toast";
+import { useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
+import { useAppData } from "../context/AppContext";
+
 const Login = () => {
-    const [loading,setLoading]=useState(false)
-    const navigate=useNavigate()
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const responseGoogle= async (authResult:any)=>{
-        setLoading(true)
-        try {
-            const result= await axios.post(`${authService}/api/auth/login`,{
-                code: authResult["code"]
-            });
+  const { setUser, setIsAuth } = useAppData();
 
-            localStorage.setItem("token",result.data.token)
-            toast.success(result.data.message)
-            setLoading(false)
-            navigate("/")
-        } catch (error) {
-            console.log(error);
-            toast.error("Problem while Loading")
-            setLoading(false)
-            
-        }
+  const responseGoogle = async (authResult: any) => {
+    setLoading(true);
+    try {
+      const result = await axios.post(`${authService}/api/auth/login`, {
+        code: authResult["code"],
+      });
+
+      localStorage.setItem("token", result.data.token);
+      toast.success(result.data.message);
+      setLoading(false);
+      setUser(result.data.user);
+      setIsAuth(true);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Problem while login");
+      setLoading(false);
     }
-  
-  const googleLogin= useGoogleLogin({
+  };
+
+  const googleLogin = useGoogleLogin({
     onSuccess: responseGoogle,
     onError: responseGoogle,
-    flow: 'auth-code'
-  })
+    flow: "auth-code",
+  });
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <div className="w-full max-w-sm space-y-6">
