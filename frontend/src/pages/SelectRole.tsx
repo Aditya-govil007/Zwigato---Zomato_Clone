@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { authService } from "../main";
 
-type Role = "customer" | "rider" | "seller" | null;
+type Role = "Customer" | "Rider" | "Seller" | null;
 const SelectRole = () => {
   const [role, setRole] = useState<Role>(null);
   const { setUser } = useAppData();
   const navigate = useNavigate();
 
-  const roles: Role[] = ["customer", "rider", "seller"];
+  const roles: Role[] = ["Customer", "Rider", "Seller"];
 
   const addRole = async () => {
     try {
@@ -25,7 +25,7 @@ const SelectRole = () => {
       );
 
       localStorage.setItem("token", data.token);
-      setUser(data.user);
+      setUser(data);
 
       navigate("/", { replace: true });
     } catch (error) {
