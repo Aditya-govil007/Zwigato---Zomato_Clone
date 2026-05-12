@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext ,useContext,useEffect,useState,type ReactNode} from "react";
 import { authService } from "../main";
-import type { AppContextType,User } from "../Types";
+import { type LocationData, type AppContextType,type User } from "../Types";
 import { Toaster } from "react-hot-toast";
 
 const AppContext= createContext<AppContextType | undefined>(undefined)
@@ -16,9 +16,9 @@ export const AppProvider = ({children}:AppProviderProps) =>{
     const [isAuth,setIsAuth]=useState(false)
     const [loading,setLoading]=useState(true)
 
-    const [location,setLocation]=useState(null)
-    const [loadinglocation,setLodingLocation]=useState(false)
-    const [city,setLodingCity]=useState('Fetching Location.....')
+    const [location,setLocation]=useState<LocationData | null>(null)
+    const [loadingLocation,setLoadingLocation]=useState(false)
+    const [city,setCity]=useState('Fetching Location.....')
 
     async function fetchUser() {
         try {
@@ -43,6 +43,44 @@ export const AppProvider = ({children}:AppProviderProps) =>{
         }
         
     }
+  useEffect(() => {
+    if (!navigator.geolocation)
+      return alert("Please Allow Location to continue");
+    setLoadingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+        );
+        const data = await res.json();
+
+        setLocation({
+          latitude,
+          longitude,
+          formattedAddress: data.display_name || "current location",
+        });
+
+        setCity(
+          data.address.city ||
+            data.address.town ||
+            data.address.village ||
+            "Your Location"
+        );
+        setLoadingLocation(false);
+      } catch (error) {
+        setLocation({
+          latitude,
+          longitude,
+          formattedAddress: "Current Location",
+        });
+        setCity("Faild to load");
+        setLoadingLocation(false);
+      }
+    });
+  }, []);
 
     useEffect(()=>{
         fetchUser()
@@ -54,7 +92,10 @@ export const AppProvider = ({children}:AppProviderProps) =>{
         setIsAuth,
         setLoading,
         setUser,
-        user}}
+        user,
+        location,
+        loadingLocation,
+        city}}
         >
         {children}
         <Toaster/>        
