@@ -32,14 +32,18 @@ export const isAuth =async (req:AuthenticatedRequest , res:Response , next :Next
             process.env.JWT_SEC as string
         ) as JwtPayload;
 
-        if(!decodeValue || !decodeValue.user){
+        if(!decodeValue || !decodeValue.id){
             res.status(401).json({
                 message:"Invalid Token",
             });
             return;
         }
 
-        req.user ={_id: decodeValue.id} as any;
+        req.user = {
+            _id: decodeValue.id,
+            role: decodeValue.role,
+            restaurantId: decodeValue.restaurantId,
+        } as any;
         next()
 
     } catch (error) {

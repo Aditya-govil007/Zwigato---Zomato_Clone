@@ -35,7 +35,7 @@ export const loginUser = TryCtach(async(req,res)=>{
             })
         }
 
-        const token = jwt.sign({id:user._id},process.env.JWT_SEC as string,{
+        const token = jwt.sign({id:user._id, role: user.role},process.env.JWT_SEC as string,{
             expiresIn:"15d",
         } );
 
@@ -73,7 +73,7 @@ export const addUserRole = TryCtach(async(req:AuthenticatedRequest, res)=>{
         });
     }
 
-    const token = jwt.sign({id:user._id},process.env.JWT_SEC as string,{
+    const token = jwt.sign({id:user._id, role: user.role},process.env.JWT_SEC as string,{
         expiresIn:"15d",
     } );
 
@@ -81,7 +81,9 @@ export const addUserRole = TryCtach(async(req:AuthenticatedRequest, res)=>{
 });
 
 export const myProfile= TryCtach(async (req: AuthenticatedRequest ,res)=>{
-    const user = req.user;
-    res.json(user);
-
+    const user = await User.findById(req.user?._id);
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ user });
 })
