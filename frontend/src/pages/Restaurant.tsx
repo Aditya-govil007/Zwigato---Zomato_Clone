@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import type { IRestaurant } from "../Types";
+import type { IMenuItem,IRestaurant } from "../Types";
 import axios from "axios";
 import { restService } from "../main";
 import AddRestaurant from "../components/AddRestaurant";
 import RestaurantProfile from "../components/RestaurantProfile";
-// import RestaurantProfile from "../components/RestaurantProfile";
-// import MenuItems from "../components/MenuItems";
-// import AddMenuItem from "../components/AddMenuItem";
-// import RestaurantOrders from "../components/RestaurantOrders";
+import MenuItems from "../components/MenuItems";
+import AddMenuItem from "../components/AddMenuItem";
+
+//  import RestaurantOrders from "../components/RestaurantOrders";
 
 type SellerTab = "menu" | "add-item" | "sales";
 
@@ -44,30 +44,31 @@ const Restaurant = () => {
     fetchMyRestaurant();
   }, []);
 
-  // const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
 
-  // const fetchMenuItems = async (restaurantId: string) => {
-  //   try {
-  //     const { data } = await axios.get(
-  //       `${restaurantService}/api/item/all/${restaurantId}`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
+  const fetchMenuItems = async (restaurantId: string) => {
+    try {
+      const { data } = await axios.get(
+        `${restService}/api/item/all/${restaurantId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-  //     setMenuItems(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+      // setMenuItems(data);
+      setMenuItems(Array.isArray(data) ? data : data.items || []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  // useEffect(() => {
-  //   if (restaurant?._id) {
-  //     fetchMenuItems(restaurant._id);
-  //   }
-  // }, [restaurant]);
+  useEffect(() => {
+    if (restaurant?._id) {
+      fetchMenuItems(restaurant._id);
+    }
+  }, [restaurant]);
 
   if (loading)
     return (
@@ -111,20 +112,17 @@ const Restaurant = () => {
         </div>
 
         <div className="p-5">
-          {tab === "menu" && <p>Menu Page</p>
-          // (
-          //   <MenuItems
-          //     items={menuItems}
-          //     onItemDeleted={() => fetchMenuItems(restaurant._id)}
-          //     isSeller={true}
-          //   />
-          // )
-          }
-          {tab === "add-item" && <p>Add Item</p>
-          // (
-          //   <AddMenuItem onItemAdded={() => fetchMenuItems(restaurant._id)} />
-          // )
-          }
+          {tab === "menu" && ( <MenuItems items={menuItems} onItemDeleted={(itemId?: string)=>{
+              if (itemId) {
+                setMenuItems((prev) => prev.filter((item) => item._id !== itemId));
+              } else {
+                fetchMenuItems(restaurant._id);
+              }
+            }}
+            isSeller={true}
+            />
+          )}
+          {tab === "add-item" && <AddMenuItem onItemAdded={()=>{fetchMenuItems(restaurant._id)}} />}
           {tab === "sales" && <p>Sales Page</p>}
         </div>
       </div>

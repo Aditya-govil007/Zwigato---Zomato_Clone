@@ -1,12 +1,15 @@
 import express  from "express";
 import { isAuth, isSeller } from "../middlewares/isauth.js";
-import { addMenuItem, deleteMenuItem, toggleMenuItemAvailavility } from "../controllers/menuitems.js";
+import { addMenuItem, deleteMenuItem, getAllItems, toggleMenuItemAvailavility } from "../controllers/menuitems.js";
+
+import uploadFile from "../middlewares/multer.js";
+import { fetchSingleRestaurant, getNearbyRestaurant } from "../controllers/Restaurant.js";
 
 const router= express.Router()
 
-router.post('/new',isAuth,isSeller,addMenuItem)
-router.get('/all/:id',isAuth,addMenuItem)
-router.delete('/:id',isAuth,isSeller,deleteMenuItem)
-router.delete('/status/:id',isAuth,isSeller,toggleMenuItemAvailavility)
+router.post('/new',isAuth,isSeller,uploadFile,addMenuItem)
+router.get('/all/:id',isAuth,getAllItems)
+router.delete('/:itemId',isAuth,isSeller,deleteMenuItem)
+router.put('/status/:itemId',isAuth,isSeller,toggleMenuItemAvailavility)
 
 export default router;

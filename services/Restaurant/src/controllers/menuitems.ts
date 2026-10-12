@@ -55,7 +55,7 @@ export const addMenuItem = TryCtach(async(req:AuthenticatedRequest,res)=>{
         description,
         price,
         restaurantId : restaurant._id,
-        image : uploadResult.url
+        image : uploadResult.url,
     })
 
     res.json({
@@ -75,7 +75,7 @@ export const getAllItems= TryCtach(async(req:AuthenticatedRequest,res)=>{
     }
 
     const items= await MenuItem.find({restaurantId: id})
-    res.json({items});
+    res.json(items);
 })
 
 export const deleteMenuItem = TryCtach(async(req:AuthenticatedRequest,res)=>{

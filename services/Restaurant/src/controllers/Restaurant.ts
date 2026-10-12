@@ -62,7 +62,7 @@ export const addRestaurant =TryCtach(async(req:AuthenticatedRequest,res )=>{
         ownerId: user._id,
         autoLocation:{
             type:"Point",
-            coordinates:[Number(latitude),Number(longitude)],
+            coordinates:[Number(longitude),Number(latitude)],
             formattedAddress,
 
         },
@@ -177,3 +177,61 @@ export const updateRestaurant = TryCtach(
     });
   }
 );
+
+export const getNearbyRestaurant= TryCtach(async(req,res)=>{
+  const {latitude, longitude, radius=5000, search=""}= req.query;
+
+  if(!latitude || !longitude){
+    return res.status(400).json({
+      message:"Latitude and Longitude are required",
+    })
+  }
+
+  const query : any ={
+    isVerified: true,
+  }
+
+  if(search && typeof search ==="string" ){
+    query.name= { $regex: search, $options: "i"};
+  }
+
+  const restaurants= await Restaurant.aggregate([
+    {
+      $geoNear:{
+        near:{
+          type:"Point",
+          coordinates:[Number(longitude), Number(latitude)]
+        },
+        distanceField: "distance",
+        maxDistance: Number(radius),
+        spherical: true,
+        query,
+      }
+    },
+    {
+      $sort:{
+        isOpen: -1,
+        distance: 1,  
+      }
+    },
+    {
+      $addFields:{
+        distanceKm:{
+          $round: [{$divide:["$distance",1000]},2]
+        },
+      }
+    }
+  ])
+
+  res.json({
+    success: true,
+    count: restaurants.length,
+    restaurants,
+  });
+
+})
+
+export const fetchSingleRestaurant= TryCtach(async(req,res)=>{
+  const restaurant = await Restaurant.findById(req.params.id);
+  res.json(restaurant);
+})
