@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext ,useContext,useEffect,useState,type ReactNode} from "react";
-import { authService } from "../main";
-import { type LocationData, type AppContextType,type User } from "../Types";
+import { authService, restService } from "../main";
+import type { LocationData, AppContextType, User, ICart } from "../Types";
 import { Toaster } from "react-hot-toast";
 
 const AppContext= createContext<AppContextType | undefined>(undefined)
@@ -37,12 +37,43 @@ export const AppProvider = ({children}:AppProviderProps) =>{
 
         } catch (error) {
             console.log(error);
-            
+
         }finally{
             setLoading(false);
         }
-        
+
     }
+
+    const [cart,setCart]= useState<ICart[]>([])
+    const [subTotal,setSubtotal] =useState(0)
+    const [quantity,setQuantity]=useState(0)
+
+    async function fetchCart () {
+      if(!user || user.role !=="Customer") return;
+      try {
+        const {data}= await axios.get(`${restService}/api/cart/all`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        setCart(data.cart || [] )
+        setSubtotal(data.subtotal || 0)
+        setQuantity(data.cartLength)
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+      useEffect(() => {
+    if (user && user.role === "Customer") {
+      fetchCart();
+    }
+  }, [user]);
+
+      useEffect(()=>{
+        fetchUser()
+    },[])
   useEffect(() => {
     if (!navigator.geolocation)
       return alert("Please Allow Location to continue");
@@ -82,9 +113,7 @@ export const AppProvider = ({children}:AppProviderProps) =>{
     });
   }, []);
 
-    useEffect(()=>{
-        fetchUser()
-    },[])
+
 
     return (<AppContext.Provider value={{
         isAuth,
@@ -95,13 +124,17 @@ export const AppProvider = ({children}:AppProviderProps) =>{
         user,
         location,
         loadingLocation,
-        city}}
+        city,
+        cart,
+        fetchCart,
+        quantity,
+        subTotal,}}
         >
         {children}
-        <Toaster/>        
+        <Toaster/>
         </AppContext.Provider>
     )
-    
+
 }
 
 export const useAppData=() : AppContextType=>{

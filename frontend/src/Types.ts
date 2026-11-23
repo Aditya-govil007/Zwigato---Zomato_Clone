@@ -25,10 +25,10 @@ export interface AppContextType {
   location: LocationData | null;
   loadingLocation: boolean;
   city: string;
-//   cart: ICart[] | null;
-//   fetchCart: () => Promise<void>;
-//   subTotal: number;
-//   quauntity: number;
+  cart: ICart[] | null;
+  fetchCart: () => Promise<void>;
+  subTotal: number;
+  quantity: number;
 }
 
 
@@ -61,4 +61,65 @@ export interface IMenuItem extends Document{
     isAvailable:boolean;
     createdAt:Date;
     updatedAt:Date;
+}
+
+export interface ICart {
+    _id:string;
+  userId: string;
+  restaurantId: string | IRestaurant;
+  itemId: string | IMenuItem;
+  quauntity: number;
+  cretedAt: Date;
+  updatedAt: Date;
+}
+
+export interface IOrder {
+  _id: string;
+  userId: string;
+  restaurantId: string;
+  restaurantName: string;
+  riderId?: string | null;
+  riderPhone: number | null;
+  riderName: string | null;
+  distance: number;
+  riderAmount: number;
+
+  items: {
+    itemId: string;
+    name: string;
+    price: number;
+    quauntity: number;
+  }[];
+
+  subtotal: number;
+  deliveryFee: number;
+  platfromFee: number;
+  totalAmount: number;
+
+  addressId: string;
+
+  deliveryAddress: {
+    fromattedAddress: string;
+    mobile: number;
+    latitude: number;
+    longitude: number;
+  };
+
+  status:
+    | "placed"
+    | "accepted"
+    | "preparing"
+    | "ready_for_rider"
+    | "rider_assigned"
+    | "picked_up"
+    | "delivered"
+    | "cancelled";
+
+  paymentMethod: "razorpay" | "stripe";
+  paymentStatus: "pending" | "paid" | "failed";
+
+  expiresAt: Date;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
