@@ -21,11 +21,16 @@ export const initSocket = (server: http.Server) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SEC!) as any;
 
-      if (!decoded || !decoded.user) {
+      if (!decoded || !decoded.id || !decoded.role) {
         return next(new Error("Unauthorized"));
       }
 
-      socket.data.user = decoded.user;
+      socket.data.user =
+      {
+        _id: decoded.id,
+        role: decoded.role,
+        restaurantId: decoded.restaurantId,
+      };
 
       next();
     } catch (error) {
