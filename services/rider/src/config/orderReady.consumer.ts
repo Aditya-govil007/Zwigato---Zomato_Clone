@@ -28,7 +28,7 @@ export const startOrderReadyConsumer = async () => {
       console.log("Searching for rider near:", location);
 
       const riders = await Rider.find({
-        isAvailble: true,
+        isAvailable: true,
         isVerified: true,
         location: {
           $near: {
