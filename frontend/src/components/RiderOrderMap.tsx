@@ -97,7 +97,7 @@ const RiderOrderMap = ({ order }: Props) => {
             },
             {
               headers: {
-                "x-internal-key": import.meta.env.VITE_INTERNAL_SERVICE_KEY,
+                "x-internal-key": import.meta.env.VITE_INTERNAL_KEY,
               },
             }
           );
