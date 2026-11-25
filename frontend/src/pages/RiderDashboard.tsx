@@ -18,7 +18,7 @@ interface IRider {
   drivingLicenseNumber: string;
   picture: string;
   isVerified: boolean;
-  isAvailble: boolean;
+  isAvailable: boolean;
 }
 
 const RiderDashboard = () => {
@@ -96,7 +96,7 @@ const RiderDashboard = () => {
   };
 
   useEffect(() => {
-    if (user?.role === "rider") fetchProfile();
+    if (user?.role === "Rider") fetchProfile();
     else setLoading(false);
   }, [user]);
 
@@ -135,7 +135,7 @@ const RiderDashboard = () => {
         await axios.patch(
           `${riderService}/api/rider/toggle`,
           {
-            isAvailble: !profile?.isAvailble,
+            isAvailable: !profile?.isAvailable,
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
           },
@@ -147,7 +147,7 @@ const RiderDashboard = () => {
         );
 
         toast.success(
-          profile?.isAvailble ? "You are offline" : "You are online"
+          profile?.isAvailable ? "You are offline" : "You are online"
         );
         fetchProfile();
       } catch (error: any) {
@@ -206,7 +206,7 @@ const RiderDashboard = () => {
     });
   };
 
-  if (user?.role !== "rider") {
+  if (user?.role !== "Rider") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-gray-500">
         You are not registered as a rider
@@ -291,7 +291,7 @@ const RiderDashboard = () => {
             </span>
 
             <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-600">
-              {profile.isAvailble ? "Online" : "Offline"}
+              {profile.isAvailable ? "Online" : "Offline"}
             </span>
           </div>
 
@@ -309,14 +309,14 @@ const RiderDashboard = () => {
               className={`w-full py-2 rounded-lg text-white font-semibold ${
                 toggling
                   ? "bg-gray-400"
-                  : profile.isAvailble
+                  : profile.isAvailable
                   ? "bg-gray-600"
                   : "bg-[#e23744]"
               }`}
             >
               {toggling
                 ? "Updating..."
-                : profile.isAvailble
+                : profile.isAvailable
                 ? "Go Offline"
                 : "Go Online"}
             </button>
@@ -347,7 +347,7 @@ const RiderDashboard = () => {
         </div>
       )}
 
-      {profile.isAvailble && incomingOrders.length > 0 && (
+      {profile.isAvailable && incomingOrders.length > 0 && (
         <div className="mx-auto max-w-md px-4 space-y-3">
           <h3 className=" font-semibold text-gray-700">Incoming Orders</h3>
           {incomingOrders.map((id) => (
