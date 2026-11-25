@@ -14,7 +14,7 @@ export const addRiderProfile = TryCtach(
       });
     }
 
-    if (user.role !== "rider") {
+    if (user.role !== "Rider") {
       return res.status(403).json({
         message: "Only riders can create rider profile",
       });
