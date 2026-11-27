@@ -40,6 +40,11 @@ const Routing = ({
   const map = useMap();
 
   useEffect(() => {
+    if (!L.Routing || typeof L.Routing.control !== "function") {
+      console.warn("leaflet-routing-machine not loaded yet");
+      return;
+    }
+
     const control = L.Routing.control({
       waypoints: [L.latLng(from), L.latLng(to)],
       lineOptions: {
@@ -67,19 +72,17 @@ const RiderOrderMap = ({ order }: Props) => {
     null
   );
 
-  if (
-    order.deliveryAddress.latitude == null ||
-    order.deliveryAddress.longitude == null
-  ) {
-    return null;
-  }
-
-  const deliveryLocation: [number, number] = [
-    order.deliveryAddress.latitude,
-    order.deliveryAddress.longitude,
-  ];
-
+  // ✅ ALL hooks must be called BEFORE any conditional return.
+  // Previously this useEffect was placed AFTER an early return, violating
+  // the Rules of Hooks and causing the white-screen crash.
   useEffect(() => {
+    if (
+      order.deliveryAddress.latitude == null ||
+      order.deliveryAddress.longitude == null
+    ) {
+      return;
+    }
+
     const fetchLocation = () => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -115,9 +118,23 @@ const RiderOrderMap = ({ order }: Props) => {
     const interval = setInterval(fetchLocation, 10000);
 
     return () => clearInterval(interval);
-  }, [order.userId]);
+  }, [order.userId, order.deliveryAddress.latitude, order.deliveryAddress.longitude]);
+
+  // ✅ Conditional returns are now AFTER all hooks
+  if (
+    order.deliveryAddress.latitude == null ||
+    order.deliveryAddress.longitude == null
+  ) {
+    return null;
+  }
+
+  const deliveryLocation: [number, number] = [
+    order.deliveryAddress.latitude,
+    order.deliveryAddress.longitude,
+  ];
 
   if (!riderLocation) return null;
+
   return (
     <div className="rounded-xl bg-white shadow-sm p-3">
       <MapContainer
