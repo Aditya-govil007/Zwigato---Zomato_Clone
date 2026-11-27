@@ -6,8 +6,7 @@ Zwigato connects customers, restaurants, and delivery riders through a real-time
 
 ## 🌐 Live Demo
 
-- **Frontend:** [Add your Vercel deployment URL]
-- **GitHub Repository:** [Zwigato — GitHub]
+- **Frontend:** https://zwigato-zomato-clone.vercel.app
 
 ## 📸 Screenshots
 
